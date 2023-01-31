@@ -5,8 +5,9 @@ import community as cm
 import igraph as ig
 import leidenalg
 import networkx as nx
+import powerlaw
 import numpy as np
-from collections import Counter
+from collections import Counter, defaultdict
 from networkx.generators.community import LFR_benchmark_graph
 import matplotlib.pyplot as plt
 
@@ -34,12 +35,14 @@ def communities_to_dict(communities):
 def get_membership_list_from_dict(membership_dict):
     return [membership_dict[i] for i in range(len(membership_dict))]
 
-def get_membership_list_from_file(file_name):
-    membership = []
+def get_membership_list_from_file(net, file_name):
+    membership = dict()
     with open(file_name) as f:
         for line in f:
-            _, m = line.strip().split()
-            membership.append(int(m))
+            i, m = line.strip().split()
+            if int(i) in net.nodes:
+                membership[int(i)] = int(m)
+                #print(i, m)
     return membership
 
 def relabel_from_zero(net_path, community_path):
@@ -64,8 +67,8 @@ def write_membership_list_to_file(file_name, membership):
 
 def compute_mixing_param(net, membership):
     n = net.number_of_nodes()
-    in_degree = np.zeros(n)
-    out_degree = np.zeros(n)
+    in_degree = defaultdict(int)#np.zeros(n)
+    out_degree = defaultdict(int)#np.zeros(n)
 
     # iterate over all edges of a graph
     for n1, n2 in net.edges:
@@ -77,12 +80,12 @@ def compute_mixing_param(net, membership):
             out_degree[n2] += 1
 
 
-    mus = [out_degree[i]/(out_degree[i]+in_degree[i]) for i in range(len(in_degree))]
+    mus = [out_degree[i]/(out_degree[i]+in_degree[i]) for i in net.nodes]
     #print(mus[:20])
     #print(list(in_degree[:20]))
     #print(list(out_degree[:20]))
     print('micro-average', np.mean(mus))
-    print('macro-average', np.sum(out_degree)/(np.sum(in_degree)+np.sum(out_degree)))
+    #print('macro-average', np.sum(out_degree)/(np.sum(in_degree)+np.sum(out_degree)))
     mixing_param = np.mean(mus)
     return mixing_param
 
@@ -92,33 +95,43 @@ if __name__ == "__main__":
                         help='network edge-list path')
     parser.add_argument('-c', metavar='clustering', type=str, required=True,
                         help='clustering membership path')
-    parser.add_argument('-r', metavar='relabel', required=False, default=False,
-                        help='relabel from zero', action=argparse.BooleanOptionalAction)
+    #parser.add_argument('-r', metavar='relabel', required=False, default=False,
+    #                    help='relabel from zero', action=argparse.BooleanOptionalAction)
     args = parser.parse_args()
 
-    if args.r:
+    '''if args.r:
         relabel_from_zero(args.n, args.c)
         args.n = args.n + '_relabeled'
-        args.c = args.c + '_relabeled'
+        args.c = args.c + '_relabeled'''
 
     print('- properties of the input network')
     net = nx.read_edgelist(args.n, nodetype=int)
     degrees = sorted([d for _, d in net.degree()])
-    min_degree, max_degree, avg_degree, median_degree = np.min(degrees), np.max(degrees), int(
-        np.mean(degrees)), np.median(degrees)
+    min_degree, max_degree, avg_degree, median_degree = np.min(degrees), np.max(degrees), np.mean(degrees), np.median(degrees)
     print('#nodes, #edges, avg degree, max degree, min degree', net.number_of_nodes(), net.number_of_edges(),
           avg_degree, max_degree, min_degree)
     #plot_dist(degrees, 'degree')
 
 
-    membership = get_membership_list_from_file(args.c)
-    sizes = Counter(membership).most_common()
-    community_size_dist = sorted([c for _, c in sizes])
-    #print(community_size_dist)
-    #plot_dist(community_size_dist, 'cm_size')
-    max_community_size = sizes[0][1]
-    min_community_size = sizes[-1][1]
-    print('#communities, max comm size, min comm size', len(sizes), max_community_size, min_community_size)
+    membership = get_membership_list_from_file(net, args.c)
+    #print(len(membership))
+    sizes = Counter(list(membership.values())).most_common()
+    #sizes = Counter(membership).most_common()
+    #community_sizes = sorted([c for _, c in sizes])
+    community_sizes = sorted([c for _, c in sizes if c != 1])
+
+    min_cm_size, max_cm_size, avg_cm_size, median_cm_size = np.min(community_sizes), np.max(community_sizes), np.mean(community_sizes), np.median(community_sizes)
+    print('#communities, max, min, mean, median comm size', len(sizes), max_cm_size, min_cm_size, avg_cm_size, median_cm_size)
+
+    degree_dist = powerlaw.Fit(degrees, discrete=True)
+    print(degree_dist.power_law.alpha)
+    print(degree_dist.power_law.xmin)
+    powerlaw.plot_pdf(community_sizes, color='b')
+    plt.show()
+
+    community_size_dist = powerlaw.Fit(community_sizes, discrete=True)
+    print(community_size_dist.power_law.alpha)
+    print(community_size_dist.power_law.xmin)
 
     mixing_param=compute_mixing_param(net, membership)
 
