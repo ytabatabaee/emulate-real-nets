@@ -1,15 +1,22 @@
 import argparse
-import random
-import time
-import community as cm
-import igraph as ig
-import leidenalg
 import networkx as nx
 import powerlaw
 import numpy as np
-from collections import Counter, defaultdict
-from networkx.generators.community import LFR_benchmark_graph
+import json
+from collections import defaultdict
+from networkx.algorithms.community import modularity
 import matplotlib.pyplot as plt
+
+
+def membership_to_partition(membership):
+    part_dict = {}
+    for index, value in membership.items():
+        if value in part_dict:
+            part_dict[value].append(index)
+        else:
+            part_dict[value] = [index]
+    return part_dict.values()
+
 
 def plot_dist(dist, name):
     plt.cla()
@@ -23,6 +30,7 @@ def plot_dist(dist, name):
     #plt.savefig('lfr-.pdf')
     plt.savefig(name+'_dist.pdf')
 
+
 def communities_to_dict(communities):
     result = {}
     community_index = 0
@@ -32,8 +40,10 @@ def communities_to_dict(communities):
         community_index += 1
     return result
 
+
 def get_membership_list_from_dict(membership_dict):
     return [membership_dict[i] for i in range(len(membership_dict))]
+
 
 def get_membership_list_from_file(net, file_name):
     membership = dict()
@@ -42,35 +52,18 @@ def get_membership_list_from_file(net, file_name):
             i, m = line.strip().split()
             if int(i) in net.nodes:
                 membership[int(i)] = int(m)
-                #print(i, m)
     return membership
-
-def relabel_from_zero(net_path, community_path):
-    with open(net_path+'_relabeled', 'w') as g:
-        with open(net_path) as f:
-            for line in f:
-                i, j = line.strip().split()
-                g.write(str(int(i)-1) + '    ' + str(int(j)-1) + '\n')
-
-    with open(community_path+'_relabeled', 'w') as g:
-        with open(community_path) as f:
-            for line in f:
-                i, m = line.strip().split()
-                g.write(str(int(i)-1) + '    ' + str(int(m)-1) + '\n')
 
 
 def write_membership_list_to_file(file_name, membership):
     with open(file_name, 'w') as f:
         f.write('\n'.join(str(i)+' '+str(membership[i]+1) for i in range(len(membership))))
-        #for i in range(len(membership)):
-        #    f.write(str(i+1)+' '+str(membership[i]+1)+'\n')
+
 
 def compute_mixing_param(net, membership):
     n = net.number_of_nodes()
-    in_degree = defaultdict(int)#np.zeros(n)
-    out_degree = defaultdict(int)#np.zeros(n)
-
-    # iterate over all edges of a graph
+    in_degree = defaultdict(int)
+    out_degree = defaultdict(int)
     for n1, n2 in net.edges:
         if membership[n1] == membership[n2]: # nodes are co-clustered
             in_degree[n1] += 1
@@ -78,16 +71,50 @@ def compute_mixing_param(net, membership):
         else:
             out_degree[n1] += 1
             out_degree[n2] += 1
-
-
     mus = [out_degree[i]/(out_degree[i]+in_degree[i]) for i in net.nodes]
-    #print(mus[:20])
-    #print(list(in_degree[:20]))
-    #print(list(out_degree[:20]))
-    print('micro-average', np.mean(mus))
-    #print('macro-average', np.sum(out_degree)/(np.sum(in_degree)+np.sum(out_degree)))
     mixing_param = np.mean(mus)
     return mixing_param
+
+
+def clustering_statistics(net, membership, show_cluster_size_dist=False):
+    partition = membership_to_partition(membership)
+    cluster_num = len(partition)
+    cluster_sizes = [len(c) for c in partition]
+    min_size, max_size, mean_size, median_size = int(np.min(cluster_sizes)), int(np.max(cluster_sizes)), np.mean(cluster_sizes), np.median(cluster_sizes)
+    singletons = [c for c in partition if len(c) == 1]
+    singletons_num = len(singletons)
+    non_singleton_num = cluster_num - singletons_num
+    modularity_score = modularity(net, partition)
+    node_count = net.number_of_nodes()
+    coverage = (node_count - singletons_num) / node_count
+    print('#clusters in partition:', cluster_num)
+    if show_cluster_size_dist:
+        print(cluster_sizes)
+    print('min, max, mean, median cluster sizes:', min_size, max_size, mean_size, median_size)
+    print('number of singletons:', singletons_num)
+    print('number of non-singleton clusters:', non_singleton_num)
+    print('modularity:', modularity_score)
+    print('coverage:', coverage)
+    return cluster_num, cluster_sizes, min_size, max_size, mean_size, median_size, singletons_num, non_singleton_num, modularity_score, coverage
+
+
+def network_statistics(graph, show_connected_components=False):
+    node_count, edge_count = graph.number_of_nodes(), graph.number_of_edges()
+    isolate_count = len(list(nx.isolates(graph)))
+    connected_components_sizes = [len(c) for c in sorted(nx.connected_components(graph), key=len, reverse=True)]
+    connected_component_num = nx.number_connected_components(graph)
+    max_connected_component = max(connected_components_sizes)
+    degrees = [d for _, d in graph.degree()]
+    min_degree, max_degree, mean_degree, median_degree = int(np.min(degrees)), int(np.max(degrees)), np.mean(degrees), np.median(
+        degrees)
+    print('#nodes, #edges, #isolates:', node_count, edge_count, isolate_count)
+    print('num connected comp:', connected_component_num)
+    print('max connected comp:', max_connected_component)
+    if show_connected_components:
+        print(connected_components_sizes)
+    print('min, max, mean, median degree:', min_degree, max_degree, mean_degree, median_degree)
+    return node_count, edge_count, degrees, isolate_count, connected_component_num, max_connected_component, min_degree, max_degree, mean_degree, median_degree
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Emulating real networks using LFR graphs.')
@@ -95,77 +122,73 @@ if __name__ == "__main__":
                         help='network edge-list path')
     parser.add_argument('-c', metavar='clustering', type=str, required=True,
                         help='clustering membership path')
-    #parser.add_argument('-r', metavar='relabel', required=False, default=False,
-    #                    help='relabel from zero', action=argparse.BooleanOptionalAction)
     args = parser.parse_args()
-
-    '''if args.r:
-        relabel_from_zero(args.n, args.c)
-        args.n = args.n + '_relabeled'
-        args.c = args.c + '_relabeled'''
 
     print('- properties of the input network')
     net = nx.read_edgelist(args.n, nodetype=int)
-    degrees = sorted([d for _, d in net.degree()])
-    min_degree, max_degree, avg_degree, median_degree = np.min(degrees), np.max(degrees), np.mean(degrees), np.median(degrees)
-    print('#nodes, #edges, avg degree, max degree, min degree', net.number_of_nodes(), net.number_of_edges(),
-          avg_degree, max_degree, min_degree)
-    #plot_dist(degrees, 'degree')
+    node_count, edge_count, degrees, isolate_count, connected_component_num, max_connected_component, \
+    min_degree, max_degree, mean_degree, median_degree = network_statistics(net)
 
-
+    print('\n- properties of the input clustering')
     membership = get_membership_list_from_file(net, args.c)
-    #print(len(membership))
-    sizes = Counter(list(membership.values())).most_common()
-    #sizes = Counter(membership).most_common()
-    #community_sizes = sorted([c for _, c in sizes])
-    community_sizes = sorted([c for _, c in sizes if c != 1])
-
-    min_cm_size, max_cm_size, avg_cm_size, median_cm_size = np.min(community_sizes), np.max(community_sizes), np.mean(community_sizes), np.median(community_sizes)
-    print('#communities, max, min, mean, median comm size', len(sizes), max_cm_size, min_cm_size, avg_cm_size, median_cm_size)
+    cluster_num, cluster_sizes, min_size, max_size, mean_size, median_size, singletons_num, non_singleton_num, \
+    modularity_score, coverage = clustering_statistics(net, membership)
 
     degree_dist = powerlaw.Fit(degrees, discrete=True)
-    print(degree_dist.power_law.alpha)
-    print(degree_dist.power_law.xmin)
-    powerlaw.plot_pdf(community_sizes, color='b')
-    plt.show()
+    tau1 = degree_dist.power_law.alpha
+    xmin1 = degree_dist.power_law.xmin
 
-    community_size_dist = powerlaw.Fit(community_sizes, discrete=True)
-    print(community_size_dist.power_law.alpha)
-    print(community_size_dist.power_law.xmin)
+    degree_dist_fixed = powerlaw.Fit(degrees, discrete=True, xmin=min_degree)
+    tau1_fixed = degree_dist_fixed.power_law.alpha
+    xmin1_fixed = degree_dist_fixed.power_law.xmin
 
-    mixing_param=compute_mixing_param(net, membership)
+    #powerlaw.plot_pdf(community_sizes, color='b')
+    #plt.savefig('citations-year_1980_2023_log.pdf')
 
-    print('mu real:', mixing_param)
-    #mixing_param = 0.1
+    community_size_dist = powerlaw.Fit(cluster_sizes, discrete=True)
+    tau2 = community_size_dist.power_law.alpha
+    xmin2 = community_size_dist.power_law.xmin
 
-    start = time.time()
-    lfr = LFR_benchmark_graph(n=net.number_of_nodes(),
-                              tau1=3, tau2=1.5,
-                              mu=0.4,
-                              average_degree=avg_degree, max_degree=max_degree,
-                              min_community=20, #max_community=max_community_size,
-                              seed=0)
-    '''lfr = LFR_benchmark_graph(n=net.number_of_nodes(),
-                              tau1=3, tau2=1.5,
-                              mu=mixing_param,
-                              average_degree=avg_degree, max_degree=100,
-                              min_community=20,
-                              seed=0)'''
-    print('\ntime spent generating the LFR graph (sec):', time.time() - start)
+    community_size_dist_fixed = powerlaw.Fit(cluster_sizes, discrete=True, xmin=min_size)
+    tau2_fixed = community_size_dist_fixed.power_law.alpha
+    xmin2_fixed = community_size_dist_fixed.power_law.xmin
 
+    mu=compute_mixing_param(net, membership)
 
-    print('\n- properties of the LFR network')
-    nx.write_edgelist(lfr, 'lfr_net_'+str(mixing_param)+'_'+args.n, data=False)
-    degrees = [d for n, d in lfr.degree()]
-    print('#nodes, #edges, avg degree, max degree, min degree', lfr.number_of_nodes(), lfr.number_of_edges(),
-          np.mean(degrees), np.max(degrees), np.min(degrees))
+    print('mixing parameter (mu):', mu)
+    print('tau1, xmin1, tau2, xmin2', tau1, xmin1, tau2, xmin2)
+    print('tau1, xmin1, tau2, xmin2 [fixed xmin]', tau1_fixed, xmin1_fixed, tau2_fixed, xmin2_fixed)
 
-    ground_truth = {frozenset(lfr.nodes[v]["community"]) for v in lfr}
-    ground_truth = get_membership_list_from_dict(communities_to_dict([list(c) for c in ground_truth]))
-    sizes = Counter(ground_truth).most_common()
-    max_community_size = sizes[0][1]
-    min_community_size = sizes[-1][1]
-    print('#communities, max comm size, min comm size', len(sizes), max_community_size, min_community_size)
-    mixing_param=compute_mixing_param(lfr, ground_truth)
-    print('mu lfr:', mixing_param)
-    write_membership_list_to_file('lfr_comm_'+str(mixing_param)+'_'+args.n, ground_truth)
+    net_cluster_stats = {
+        "node-count": node_count,
+        "edge-count": edge_count,
+        "isolate-count": isolate_count,
+        "num-connected-components": connected_component_num,
+        "max-connected-components": max_connected_component,
+        "min-degree": min_degree,
+        "max-degree": max_degree,
+        "mean-degree": mean_degree,
+        "median-degree": median_degree,
+        "num-clusters": cluster_num,
+        "min-cluster-size": min_size,
+        "max-cluster-size": max_size,
+        "mean-cluster-size": mean_size,
+        "median-cluster-size": median_size,
+        "num-singletons": singletons_num,
+        "num-non-singletons": non_singleton_num,
+        "modularity-score": modularity_score,
+        "node-coverage": coverage,
+        "mixing-parameter": mu,
+        "tau1": tau1,
+        "xmin1": xmin1,
+        "tau2": tau2,
+        "xmin2": xmin2,
+        "tau1-fixed": tau1_fixed,
+        "xmin1-fixed": xmin1_fixed,
+        "tau2-fixed": tau2_fixed,
+        "xmin2-fixed": xmin2_fixed
+    }
+
+    with open(args.c.replace('.tsv', '')+".json", "w") as f:
+        json_object = json.dumps(net_cluster_stats, indent=4)#, default=str)
+        f.write(json_object)
