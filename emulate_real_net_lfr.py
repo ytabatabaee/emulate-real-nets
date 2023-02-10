@@ -81,8 +81,7 @@ def clustering_statistics(net, membership, show_cluster_size_dist=False):
     cluster_num = len(partition)
     cluster_sizes = [len(c) for c in partition]
     min_size, max_size, mean_size, median_size = int(np.min(cluster_sizes)), int(np.max(cluster_sizes)), np.mean(cluster_sizes), np.median(cluster_sizes)
-    singletons = [c for c in partition if len(c) == 1]
-    singletons_num = len(singletons)
+    singletons_num = cluster_sizes.count(1)
     non_singleton_num = cluster_num - singletons_num
     modularity_score = modularity(net, partition)
     node_count = net.number_of_nodes()
@@ -101,8 +100,8 @@ def clustering_statistics(net, membership, show_cluster_size_dist=False):
 def network_statistics(graph, show_connected_components=False):
     node_count, edge_count = graph.number_of_nodes(), graph.number_of_edges()
     isolate_count = len(list(nx.isolates(graph)))
-    connected_components_sizes = [len(c) for c in sorted(nx.connected_components(graph), key=len, reverse=True)]
-    connected_component_num = nx.number_connected_components(graph)
+    connected_components_sizes = [len(c) for c in nx.connected_components(graph)]
+    connected_component_num = len(connected_components_sizes)
     max_connected_component = max(connected_components_sizes)
     degrees = [d for _, d in graph.degree()]
     min_degree, max_degree, mean_degree, median_degree = int(np.min(degrees)), int(np.max(degrees)), np.mean(degrees), np.median(
@@ -111,7 +110,7 @@ def network_statistics(graph, show_connected_components=False):
     print('num connected comp:', connected_component_num)
     print('max connected comp:', max_connected_component)
     if show_connected_components:
-        print(connected_components_sizes)
+        print(sorted(connected_components_sizes, reverse=True))
     print('min, max, mean, median degree:', min_degree, max_degree, mean_degree, median_degree)
     return node_count, edge_count, degrees, isolate_count, connected_component_num, max_connected_component, min_degree, max_degree, mean_degree, median_degree
 
