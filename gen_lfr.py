@@ -9,6 +9,7 @@ import os
 def gen_lfr(stats_path, lfr_path, cmin):
     with open(stats_path) as f:
         net_cluster_stats = json.load(f)
+    base_path = os.getcwd()
     lfr_net_dir = stats_path.replace('.json', '')+"_lfr_"+cmin
     if not os.path.exists(lfr_net_dir):
         os.system('mkdir ' + lfr_net_dir)
@@ -29,7 +30,7 @@ def gen_lfr(stats_path, lfr_path, cmin):
        net_cluster_stats['max-cluster-size'] = 5000
     if net_cluster_stats['mean-degree'] > 50:
        net_cluster_stats['max-cluster-size'] = 1000
-    cmd = '../'+lfr_path+ '/benchmark -N ' + str(net_cluster_stats['node-count']) \
+    cmd = base_path+'/'+lfr_path+ '/benchmark -N ' + str(net_cluster_stats['node-count']) \
                             + ' -k ' + str(net_cluster_stats['mean-degree']) \
                             + ' -maxk ' + str(net_cluster_stats['max-degree']) \
                             + ' -mu ' + str(net_cluster_stats['mixing-parameter']) \
