@@ -31,8 +31,8 @@ def get_membership_list_from_file(net, file_name):
     with open(file_name) as f:
         for line in f:
             i, m = line.strip().split()
-            #if net.hasNode(int(i)):
-            membership[int(i)] = int(m)
+            if net.hasNode(int(i)):
+                membership[int(i)] = m
     return membership
 
 
@@ -116,7 +116,7 @@ if __name__ == "__main__":
 
     print('- properties of the input network')
     #net = nx.read_edgelist(args.n, nodetype=int)
-    net = nk.readGraph(args.n, nk.Format.SNAP)
+    net = nk.readGraph(args.n, nk.Format.EdgeListTabZero)
     node_count, edge_count, degrees, isolate_count, connected_component_num, max_connected_component, \
     min_degree, max_degree, mean_degree, median_degree = network_statistics(net)
 
@@ -179,6 +179,6 @@ if __name__ == "__main__":
         "xmin2-fixed": xmin2_fixed
     }
 
-    with open(args.c.replace('.tsv', '')+"2.json", "w") as f:
+    with open(args.c.replace('.tsv', '')+".json", "w") as f:
         json_object = json.dumps(net_cluster_stats, indent=4)
         f.write(json_object)
