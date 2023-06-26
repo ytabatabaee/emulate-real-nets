@@ -1,3 +1,4 @@
 NetworkX
 numpy
 powerlaw
+networkit
