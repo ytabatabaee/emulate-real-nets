@@ -10,6 +10,7 @@ These scripts are implemented in Python 3 and have the following dependencies:
 - [NetworkX](https://networkx.org)
 - [Numpy](https://numpy.org)
 - [powerlaw](https://pypi.org/project/powerlaw/)
+- [NetworKit](https://networkit.github.io/) (for large networks only)
 
 If you have Python 3 and pip, you can use `pip install -r requirements.txt` to install the other dependencies. We provide the LFR benchmark graph software in `binary_networks` directory, but it can also be downloaded from [https://www.santofortunato.net/resources](https://www.santofortunato.net/resources).
 
@@ -106,3 +107,5 @@ network of 34546 vertices and 429828 edges;	 average degree = 24.8844
 average mixing parameter: 0.379969 +/- 0.0194945
 p_in: 0.368457	p_out: 0.00025681
 ```
+### Handling large networks
+For very large networks (e.g. with more than 100 million edges), the `estimate_properties.py` script can be slow and have high memory usage. For these networks, we suggest using `estimate_properties_networkit.py` instead, that uses `NetworKit` library instead of `NetworkX` which is more scalable. The I/O format is similar. Also, the LFR graph software is not scalable to large networks (more than 10 million nodes) and even for small networks, it may not successfully produce a network with the given properties in a reasonable time in some cases (e.g. when the mixing parameter is very high). The `gen_lfr.py` script reduces the size of large networks to 3 million nodes while keeping the density (average degree) and other characteristics intact. In some cases, it also varies the ranges of community sizes to increase the chances of successfuly producing an output.
