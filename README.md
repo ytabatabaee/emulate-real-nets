@@ -69,7 +69,7 @@ $ python3 gen_lfr.py -n <clustering_memberships.json> -lp <lfr-benchmark-softwar
 
 The LFR output files will be located in a directory called `<clustering_memberships>_lfr_<cmin>` and the log of the LFR software will be printed out.
 
-**Example:** 
+**Example:**
 ```
 $ python3 gen_lfr.py -n example/cit_hepph_leiden.01.json -lp binary_networks -cm 20 > example/cit_hepph_leiden.01.log
 ```
@@ -96,8 +96,8 @@ number of memberships of the overlapping nodes:	0
 community size range set equal to [20 , 800]
 **************************************************************
 
-building communities... 
-connecting communities... 
+building communities...
+connecting communities...
 recording network...
 
 
@@ -108,4 +108,4 @@ average mixing parameter: 0.379969 +/- 0.0194945
 p_in: 0.368457	p_out: 0.00025681
 ```
 ### Handling large networks
-For very large networks (e.g. with more than 100 million edges), the `estimate_properties.py` script can be slow and have high memory usage. For these networks, we suggest using `estimate_properties_networkit.py` instead, that uses `NetworKit` library instead of `NetworkX` which is more scalable. The I/O format is similar. Also, the LFR graph software is not scalable to large networks (more than 10 million nodes) and even for small networks, it may not successfully produce a network with the given properties in a reasonable time in some cases (e.g. when the mixing parameter is very high). The `gen_lfr.py` script reduces the size of large networks to 3 million nodes while keeping the density (average degree) and other characteristics intact. In some cases, it also varies the ranges of community sizes to increase the chances of successfuly producing an output.
+For very large networks (e.g. with more than 100 million edges), the `estimate_properties.py` script can be slow and have high memory usage. For these networks, we suggest using `estimate_properties_networkit.py` instead, that uses `NetworKit` library which is more scalable than `NetworkX`. The I/O format is similar, but the network nodes should be labeled 0 to $n-1$. Also, the LFR graph software is not scalable to large networks (more than 10 million nodes) and even for small networks, it may not successfully produce a network with the given properties in a reasonable time in some cases (e.g. when the mixing parameter is very high). The `gen_lfr.py` script reduces the size of large networks to 3 million nodes while keeping the density (average degree) and other characteristics intact. In some cases, it also varies the ranges of community sizes to increase the chances of successfuly producing an output.

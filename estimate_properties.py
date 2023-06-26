@@ -33,7 +33,7 @@ def get_membership_list_from_file(net, file_name):
         for line in f:
             i, m = line.strip().split()
             if int(i) in net.nodes:
-                membership[int(i)] = int(m)
+                membership[int(i)] = m
     return membership
 
 
