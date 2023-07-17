@@ -12,7 +12,7 @@ These scripts are implemented in Python 3 and have the following dependencies:
 - [powerlaw](https://pypi.org/project/powerlaw/)
 - [NetworKit](https://networkit.github.io/) (for large networks only)
 
-If you have Python 3 and pip, you can use `pip install -r requirements.txt` to install the other dependencies. We provide the LFR benchmark software binary files for mac and linux in `binary_networks` directory, but it can also be downloaded from [https://www.santofortunato.net/resources](https://www.santofortunato.net/resources).
+If you have Python 3 and pip, you can use `pip install -r requirements.txt` to install the other dependencies. We provide the LFR benchmark software binary files for MacOS and Linux in `binary_networks` directory, but the software can also be downloaded and compiled from [https://www.santofortunato.net/resources](https://www.santofortunato.net/resources).
 
 ## Usage Instructions
 
@@ -61,13 +61,15 @@ $ python3 estimate_properties.py -n example/cit_hepph_cleaned.tsv -c example/cit
 ### Emulating a network/clustering with LFR graphs
 **Input:** A JSON file as generated in the previous step, path to the LFR software executable and a minimum community size (for most networks, we do not suggest using values less than 10 for `cmin`, as LFR software may not able to generate the graph in a reasonable time).
 
-**Output:** A directory with the LFR network (`network.dat`) and its ground-turth communities (`community.dat`), as well as statistics of the LFR network/communities (`statistics.dat`).
+**Output:** A directory with the LFR network edge-list (`network.dat`) and its ground-truth community memberships (`community.dat`), as well as statistics of the LFR network/communities (`statistics.dat`).
 
 ```
 $ python3 gen_lfr.py -n <clustering_memberships.json> -lp <lfr-benchmark-software-path> -cm <cmin_value>
 ```
 
 The LFR output files will be located in a directory called `<clustering_memberships>_lfr_<cmin>` and the log of the LFR software will be printed out.
+
+*Note*: The LFR software binary for MacOS is `binary_networks/lfr_mac` and the binary file for Linux systems is `binary_networks/lfr_linux`.
 
 **Example:**
 ```
