@@ -12,7 +12,7 @@ These scripts are implemented in Python 3 and have the following dependencies:
 - [powerlaw](https://pypi.org/project/powerlaw/)
 - [NetworKit](https://networkit.github.io/) (for large networks only)
 
-If you have Python 3 and pip, you can use `pip install -r requirements.txt` to install the other dependencies. We provide the LFR benchmark graph software in `binary_networks` directory, but it can also be downloaded from [https://www.santofortunato.net/resources](https://www.santofortunato.net/resources).
+If you have Python 3 and pip, you can use `pip install -r requirements.txt` to install the other dependencies. We provide the LFR benchmark software binary files for mac and linux in `binary_networks` directory, but it can also be downloaded from [https://www.santofortunato.net/resources](https://www.santofortunato.net/resources).
 
 ## Usage Instructions
 
@@ -71,7 +71,7 @@ The LFR output files will be located in a directory called `<clustering_membersh
 
 **Example:**
 ```
-$ python3 gen_lfr.py -n example/cit_hepph_leiden.01.json -lp binary_networks -cm 20 > example/cit_hepph_leiden.01.log
+$ python3 gen_lfr.py -n example/cit_hepph_leiden.01.json -lp binary_networks/lfr_mac -cm 20 > example/cit_hepph_leiden.01.log
 ```
 ```
 ./binary_networks/benchmark -N 34546 -k 24.36617842876165 -maxk 846 -mu 0.37999943730019126 -maxc 800 -minc 20 -t1 3.6312283315636975 -t2 1.8497807268067572

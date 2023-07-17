@@ -30,7 +30,7 @@ def gen_lfr(stats_path, lfr_path, cmin):
        net_cluster_stats['max-cluster-size'] = 5000
     if net_cluster_stats['mean-degree'] > 50:
        net_cluster_stats['max-cluster-size'] = 1000
-    cmd = base_path+'/'+lfr_path+ '/benchmark -N ' + str(net_cluster_stats['node-count']) \
+    cmd = base_path+'/'+lfr_path+ ' -N ' + str(net_cluster_stats['node-count']) \
                             + ' -k ' + str(net_cluster_stats['mean-degree']) \
                             + ' -maxk ' + str(net_cluster_stats['max-degree']) \
                             + ' -mu ' + str(net_cluster_stats['mixing-parameter']) \
