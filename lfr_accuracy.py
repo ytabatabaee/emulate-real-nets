@@ -73,7 +73,7 @@ def get_membership_list_add_singletons(gt_path, f1_path, f2_path):
             mem2[i] = membership2[i]
         else:
             mem2[i] = i
-    print('#singletons added to post-CM clustering:', len(set(membership2.values())) - len(set(mem2.values())))
+    print('#singletons added to post-CM clustering:', len(set(mem2.values())) - len(set(membership2.values())))
     print(len(set(mem_gt.keys())), len(set(mem1.keys())), len(set(mem2.keys())))
     return list(mem_gt.values()), list(mem1.values()), list(mem2.values())
 
