@@ -21,7 +21,7 @@ If you have Python 3 and pip, you can use `pip install -r requirements.txt` to i
 ```
 $ python3 estimate_properties.py -n <network_edgelist.tsv> -c <clustering_memberships.tsv>
 ```
-**Output:** A file in JSON format named `<clustering_memberships.json>` that provides information shown in following example.
+**Output:** A JSON file named `<clustering_memberships.json>` (located in the *input clustering directory*) that provides information shown in the following example.
 
 **Example:** We use the [arXiv High energy physics citation network](http://snap.stanford.edu/data/cit-HepPh.html) from the [SNAP collection](http://snap.stanford.edu/index.html) and a Leiden clustering of it (with `r=0.01`) as an example input:
 ```
@@ -69,11 +69,11 @@ $ python3 gen_lfr.py -n <clustering_memberships.json> -lp <lfr-benchmark-softwar
 
 The LFR output files will be located in a directory called `<clustering_memberships>_lfr_<cmin>` and the log of the LFR software will be printed out.
 
-*Note*: The LFR software binary for MacOS is `binary_networks/lfr_mac` and the binary file for Linux systems is `binary_networks/lfr_linux`.
+**Note**: The LFR software binary for MacOS is `binary_networks/lfr_linux` and the binary file for Linux systems is `binary_networks/lfr_linux`.
 
 **Example:**
 ```
-$ python3 gen_lfr.py -n example/cit_hepph_leiden.01.json -lp binary_networks/lfr_mac -cm 20 > example/cit_hepph_leiden.01.log
+$ python3 gen_lfr.py -n example/cit_hepph_leiden.01.json -lp binary_networks/lfr_linux -cm 20 > example/cit_hepph_leiden.01.log
 ```
 ```
 ./binary_networks/benchmark -N 34546 -k 24.36617842876165 -maxk 846 -mu 0.37999943730019126 -maxc 800 -minc 20 -t1 3.6312283315636975 -t2 1.8497807268067572

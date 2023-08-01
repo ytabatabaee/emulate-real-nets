@@ -53,7 +53,7 @@ def compute_mixing_param(net, membership):
         else:
             out_degree[n1] += 1
             out_degree[n2] += 1
-    mus = [out_degree[i]/(out_degree[i]+in_degree[i]) for i in net.nodes]
+    mus = [out_degree[i]/(out_degree[i]+in_degree[i]) if (out_degree[i]+in_degree[i]) != 0 else 0 for i in net.nodes]
     mixing_param = np.mean(mus)
     return mixing_param
 
