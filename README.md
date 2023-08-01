@@ -69,7 +69,7 @@ $ python3 gen_lfr.py -n <clustering_memberships.json> -lp <lfr-benchmark-softwar
 
 The LFR output files will be located in a directory called `<clustering_memberships>_lfr_<cmin>` and the log of the LFR software will be printed out.
 
-**Note**: The LFR software binary for MacOS is `binary_networks/lfr_linux` and the binary file for Linux systems is `binary_networks/lfr_linux`.
+**Note**: The LFR software binary for MacOS is `binary_networks/lfr_mac` and the binary file for Linux systems is `binary_networks/lfr_linux`.
 
 **Example:**
 ```
