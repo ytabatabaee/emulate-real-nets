@@ -78,6 +78,33 @@ def get_membership_list_add_singletons(gt_path, f1_path, f2_path):
     return list(mem_gt.values()), list(mem1.values()), list(mem2.values())
 
 
+def measure_accuracy(mem_true, mem_est):
+    n = len(mem_true)
+    tn, tp, fn, fp = 0, 0, 0, 0
+    for i in range(n):
+        for j in range(i + 1, n):
+            if mem_true[i] == mem_true[j]:
+                if mem_est[i] == mem_est[j]:
+                    tp += 1
+                else:
+                    fn += 1
+            else:
+                if mem_est[i] == mem_est[j]:
+                    fp += 1
+                else:
+                    tn += 1
+    precision = tp / (tp + fp)
+    recall = tp / (tp + fn)
+    f1_score = 2 * precision * recall / (precision + recall)
+    fnr = fn / (fn + tp)
+    fpr = fp / (fp + tn)
+
+    nmi = normalized_mutual_info_score(mem_true, mem_est)
+    ari = adjusted_rand_score(mem_true, mem_est)
+    ami = adjusted_mutual_info_score(mem_true, mem_est)
+
+    return nmi, ami, ari, precision, recall, f1_score, fnr, fpr
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="LFR accuracy for pre-CM vs post-CM partitions")
@@ -99,14 +126,20 @@ if __name__ == '__main__':
     print('min, max, mean, median cluster sizes:', min_size, max_size, mean_size, median_size)
 
     # https://scikit-learn.org/stable/modules/classes.html#module-sklearn.metrics.cluster
-    print('Statistics for original Leiden clustering:')
-    print("Normalized mutual information (NMI): ", normalized_mutual_info_score(gt_membership, membership1))
-    print("Adjusted rand index (ARI): ", adjusted_rand_score(gt_membership, membership1))
-    print("Adjusted mutual information (AMI): ", adjusted_mutual_info_score(gt_membership, membership1))
+    print('\nStatistics for original Leiden clustering:')
+    nmi, ami, ari, precision, recall, f1_score, fnr, fpr = measure_accuracy(gt_membership, membership1)
+    print("Normalized mutual information (NMI): ", nmi)
+    print("Adjusted rand index (ARI): ", ari)
+    print("Adjusted mutual information (AMI): ", ami)
+    print("False positive rate (FPR), False negative rate (FNR):", fpr, fnr)
+    print("Precision, Recall, F1-score:", precision, recall, f1_score)
 
 
-    print('Statistics for post-CM Leiden clustering:')
-    print("Normalized mutual information (NMI): ", normalized_mutual_info_score(gt_membership, membership2))
-    print("Adjusted rand index (ARI): ", adjusted_rand_score(gt_membership, membership2))
-    print("Adjusted mutual information (AMI): ", adjusted_mutual_info_score(gt_membership, membership2))
+    print('\nStatistics for post-CM Leiden clustering:')
+    nmi, ami, ari, precision, recall, f1_score, fnr, fpr = measure_accuracy(gt_membership, membership2)
+    print("Normalized mutual information (NMI): ", nmi)
+    print("Adjusted rand index (ARI): ", ari)
+    print("Adjusted mutual information (AMI): ", ami)
+    print("False positive rate (FPR), False negative rate (FNR):", fpr, fnr)
+    print("Precision, Recall, F1-score:", precision, recall, f1_score)
 
