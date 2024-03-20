@@ -1,7 +1,9 @@
 # Emulating real networks with LFR graphs
 We provide scripts for estimating the parameters of a network and a clustering of that network, and generating a synthetic LFR graph ([Lancichinetti et al., 2008](https://journals.aps.org/pre/abstract/10.1103/PhysRevE.78.046110)) that attempts to resemble the characteristics of this network/clustering pair. These scripts are used in the following paper for emulating real networks using LFR graphs:
 
-M. Park, Y. Tabatabaee, B. Liu, V. Kamath Pailodi, V. Ramavarapu, R. Ramachandran, D. Korobskiy, F. Ayres, G. Chacko, T. Warnow. Well-Connected Communities in Real-World Networks. [https://arxiv.org/abs/2303.02813.](https://arxiv.org/abs/2303.02813)
+M. Park*, Y. Tabatabaee*, V. Ramavarapu*, B. Liu, V. Pailodi, R. Ramachandran, D. Korobskiy, F. Ayres, G. Chacko, and T. Warnow. Identifying well connected communities in real-world and synthetic networks, International Conference on Complex Networks and their Applications 2023. https://link.springer.com/chapter/10.1007/978-3-031-53499-7_1
+
+
 
 ## Dependencies
 These scripts are implemented in Python 3 and have the following dependencies:
