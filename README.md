@@ -3,7 +3,7 @@ We provide scripts for estimating the parameters of a network and a clustering o
 
 M. Park*, Y. Tabatabaee*, V. Ramavarapu*, B. Liu, V. Pailodi, R. Ramachandran, D. Korobskiy, F. Ayres, G. Chacko, and T. Warnow. Identifying well connected communities in real-world and synthetic networks, International Conference on Complex Networks and their Applications 2023. https://link.springer.com/chapter/10.1007/978-3-031-53499-7_1
 
-The characteristics and parameters of the input data used in this manuscript are provided in [data_characteristics/network_params_lfr.csv](https://github.com/ytabatabaee/emulate-real-nets/blob/main/data_characteristics/network_params_lfr.csv). The data themselves are available at [Illinois Data Bank](https://databank.illinois.edu/datasets/IDB-0908742).
+The characteristics and parameters of the input data used in this manuscript are provided in [data_characteristics/network_params_lfr.csv](https://github.com/ytabatabaee/emulate-real-nets/blob/main/data_characteristics/network_params_lfr.csv). The data themselves are available at [Illinois Data Bank](https://databank.illinois.edu/datasets/IDB-6271968).
 
 
 
