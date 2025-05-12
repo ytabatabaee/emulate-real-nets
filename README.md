@@ -1,7 +1,7 @@
 # Emulating real networks with LFR graphs
 We provide scripts for estimating the parameters of a network and a clustering of that network, and generating a synthetic LFR graph ([Lancichinetti et al., 2008](https://journals.aps.org/pre/abstract/10.1103/PhysRevE.78.046110)) that attempts to resemble the characteristics of this network/clustering pair. These scripts are used in the following paper for emulating real networks using LFR graphs:
 
-M. Park*, Y. Tabatabaee*, V. Ramavarapu*, B. Liu, V. Pailodi, R. Ramachandran, D. Korobskiy, F. Ayres, G. Chacko, and T. Warnow. Identifying well connected communities in real-world and synthetic networks, International Conference on Complex Networks and their Applications 2023. https://link.springer.com/chapter/10.1007/978-3-031-53499-7_1
+M. Park*, Y. Tabatabaee*, V. Ramavarapu*, B. Liu, V. Pailodi, R. Ramachandran, D. Korobskiy, F. Ayres, G. Chacko, and T. Warnow. Well-Connectedness and Community Detection. PLOS Complex Systems. Vol. 1, No. 3: e0000009. https://journals.plos.org/complexsystems/article?id=10.1371/journal.pcsy.0000009
 
 The characteristics and parameters of the input data used in this manuscript are provided in [data_characteristics/network_params_lfr.csv](https://github.com/ytabatabaee/emulate-real-nets/blob/main/data_characteristics/network_params_lfr.csv). The data themselves are available at [Illinois Data Bank](https://databank.illinois.edu/datasets/IDB-6271968).
 
