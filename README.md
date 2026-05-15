@@ -20,6 +20,13 @@ If you have Python 3 and pip, you can use `pip install -r requirements.txt` to i
 
 ## Usage Instructions
 
+### One-command pipeline
+If you want to run both steps with a single command, use the master pipeline script:
+```
+$ python3 run_pipeline.py -n <network_edgelist.tsv> -c <clustering_memberships.tsv> -lp <lfr-benchmark-software-path> -cm <cmin_value>
+```
+For large networks, you can use the NetworKit-based estimator with `--networkit`.
+
 ### Estimating parameters of a network/clustering pair
 **Input:** A file containing a network edge-list and a file containing clustering memberships on the same network.
 ```
